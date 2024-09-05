@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Update - Iligan City</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-image: url('you.jpg');
+            background-size: cover;
+            background-position: center;
+            color: #333;
+            text-align: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+            height: 55px;
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            padding: 0 48px 0 42px;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.5);
+            font-size: 17px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            outline: none;
+            color: #333;
+            font-weight: 500;
+            text-transform: uppercase;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-container input::placeholder {
+            color: black;
+            text-transform: capitalize;
+        }
+
+        .search-container button {
+            position: absolute;
+            background: transparent;
+            border: none;
+            width: 40px;
+            height: 100%;
+            right: 0;
+            top: 0;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .weather-box {
+            width: 400px;
+            height: 555px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            margin: 0 auto;
+        }
+
+        .weather-box img {
+            width: 60%;
+            margin-bottom: 20px;
+        }
+
+        .weather-box .temperature {
+            font-size: 64px;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+
+        .weather-box .temperature span {
+            font-size: 24px;
+        }
+
+        .weather-box .description {
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        .weather-details {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .weather-details .humidity, .weather-details .wind {
+            display: flex;
+            align-items: center;
+        }
+
+        .weather-details i {
+            font-size: 56px;
+            margin-right: 10px;
+        }
+
+        .weather-details span {
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        .weather-details p {
+            font-size: 14px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather Update</h1>
+    <div id="weather">
+        <div class="search-container">
+            <input type="text" placeholder="Enter city name" spellcheck="false">
+            <button><img src="search.png" alt="Search"></button>
+        </div>
+        <div class="weather-box">
+            <div class="box">
+                <div class="info-weather">
+                    <div class="weather">
+                        <img id="weather-icon" src="clear.png" alt="Weather Icon">                      
+                        <p class="temperature">16<span>°C</span></p>
+                        <p class="description">Broken Clouds</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="weather-details">
+            <div class="humidity">
+                <i><img src="water.png" alt="Humidity Icon"></i>
+                <div class="text">
+                    <div class="info-humidity">
+                        <span>0%</span>
+                    </div>
+                    <p>Humidity</p>
+                </div>
+            </div>
+            <div class="wind">
+                <i><img src="wind.png" alt="Wind Speed Icon"></i>
+                <div class="text">
+                    <div class="info-wind">
+                        <span>0 km/h</span>
+                    </div>
+                    <p>Wind Speed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const weatherIcon = document.getElementById('weather-icon');
+            const searchButton = document.querySelector('.search-container button');
+            const weatherBox = document.querySelector('.weather-box');
+            const weatherDetails = document.querySelector('.weather-details');
+            const temperatureElement = document.querySelector('.weather-box .temperature');
+            const descriptionElement = document.querySelector('.weather-box .description');
+            const humidityElement = document.querySelector('.weather-details .humidity span');
+            const windElement = document.querySelector('.weather-details .wind span');
+
+            searchButton.addEventListener('click', async () => {
+                const APIKey = '2a3344bb5f3f4bb384001526240509';
+                const cityName = document.querySelector('.search-container input').value;
+
+                if (!cityName) {
+                    alert('Please enter a city name');
+                    return;
+                }
+
+                const apiEndpoint = `https://api.weatherapi.com/v1/forecast.json?key=${APIKey}&q=${cityName}&days=3`;
+
+                try {
+                    const response = await fetch(apiEndpoint);
+                    if (!response.ok) {
+                        throw new Error('City not found');
+                    }
+                    const weatherData = await response.json();
+                    console.log(weatherData);
+
+                    const weatherCondition = weatherData.current.condition.text;
+                    const temperature = weatherData.current.temp_c;
+                    const humidity = weatherData.current.humidity;
+                    const windSpeed = weatherData.current.wind_kph;
+
+                    switch (weatherCondition) {
+                        case 'Clear':
+                            weatherIcon.src = 'clear.png';
+                            break;
+                        case 'Rain':
+                            weatherIcon.src = 'rain.jpg';
+                            break;
+                        case 'Snow':
+                            weatherIcon.src = 'snow.jpg';
+                            break;
+                        case 'Mist':
+                            weatherIcon.src = 'mist.jpg';
+                            break;
+                        case 'Overcast':
+                            weatherIcon.src = 'haze.jpg';
+                        case 'Lightrainshower':
+                            weatherIcon.src = 'Lightrainshower.jpg';
+                            break;
+                        default:
+                            weatherIcon.src = 'cloud.png';
+                    }
+
+                    temperatureElement.innerHTML = `${parseInt(temperature)}<span>°C</span>`;
+                    descriptionElement.textContent = weatherCondition;
+                    humidityElement.textContent = `${parseInt(humidity)}%`;
+                    windElement.textContent = `${parseInt(windSpeed)} km/h`;
+
+                    weatherBox.classList.add('active');
+                    weatherDetails.classList.add('active');
+                } catch (error) {
+                    console.error('Error fetching weather data:', error);
+                    alert('Unable to fetch weather data. Please try again.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
